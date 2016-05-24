@@ -1,0 +1,8 @@
+{
+  "name": "Bronto Chat App",
+  "description": "A simple event based chat",
+  "repository": "https://github.com/ledicjp/bronto",
+  "logo": "http://node-js-sample.herokuapp.com/node.svg",
+  "keywords": ["node", "express", "static"],
+  "image": "heroku/nodejs"
+}
