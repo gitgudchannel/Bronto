@@ -7,93 +7,189 @@
     <script src="https://code.jquery.com/jquery-1.12.4.min.js"></script>
     <script src="https://cdn.socket.io/socket.io-1.2.0.js"></script>
     <style>
-        body{
-            margin-top:30px;
+        body {
+            margin-top: 30px;
         }
-        #messageArea{
-            display:none;
+
+        #messageArea {
+            display: none;
         }
+
+        #onlineusers {
+            display: none;
+        }
+
+        #chatcontainer {
+            min-height: 70vh;
+            max-height: 70vh;
+            overflow: hidden;
+        }
+
+        #chat {
+            width: 750px;
+        }
+
+        .glyphicon-envelope {
+            margin-left: 5px;
+            top: 5px;
+        }
+
+        .container .jumbotron {
+            text-align: center;
+            padding:0px 3px;
+        }
+
+        #myRow {
+            padding-left: 15px;
+        }
+
+        #messageFormContainer {
+            min-width: 400px;
+            max-width: 400px;
+        }
+
+
+        .col-md-2 .list {
+            margin-left: 20px;
+            list-style-type: square;
+            color: #008800;
+        }
+        .col-md-2 h3 {
+            margin-left: 18px;
+
+        }
+
+        .form-group {
+            width: 350px;
+            height: 150px;
+        }
+
+
     </style>
 </head>
 <body>
+<div id="main" class="container">
     <div class="container">
-        <div id="userFormArea" class="row">
-            <div class="col-md-12">
+        <div class="jumbotron">
+            <h1>Bronto Chat  <span class="glyphicon glyphicon-envelope"></span></h1>
+        </div>
+    </div>
+    <div id="userFormArea" class="row">
+        <div class="col-md-8">
+            <div class="container">
                 <form id="userForm">
                     <div class="form-group">
                         <label>Enter Username</label>
-                        <br />
+                        <br/>
                         <input class="form-control" id="username"/>
-                        <br />
+                        <br/>
                         <input type="submit" class="btn btn-primary" value="Login"/>
                     </div>
                 </form>
             </div>
-
         </div>
 
-        <div id="messageArea" class="row">
-            <div class="col-md-4">
-                <h3>Online Users</h3>
-                <ul class="list-group" id="users"></ul>
-            </div>
-            <div class="col-md-8">
-                <div class="chat" id="chat"></div>
+    </div>
 
+
+
+    <div id="messageArea" class="row">
+
+            <div class="col-md-2">
+                <h3>Online Users</h3>
+                <ul class="list" id="users"></ul>
+            </div>
+
+
+        <div class="col-md-8">
+            <div id="chatcontainer" class="container">
+                <div class="chat" id="chat"></div>
+            </div>
+
+
+            <div id="messageFormContainer" class="container">
                 <form id="messageForm">
-                    <div class="form-group">
+                    <div id="formgroup" class="form-group">
                         <label>Enter Message</label>
-                        <br />
+                        <br/>
                         <textarea class="form-control" id="message"></textarea>
-                        <br />
-                        <input type="submit" class="btn btn-primary" value="Send Message"/>
+                        <br/>
+                        <div id="myRow" class="row">
+                            <input id="submitMessage" type="submit" class="btn btn-primary" value="Send Message"/>
+
+                            <input id="clearbutton" type="button" class="btn btn-primary" value="Clear Chat"/>
+                            <input id="supsonbutton" type="button" class="btn btn-primary" value="¯&#92_(ツ)_/¯"/>
+                        </div>
                     </div>
                 </form>
             </div>
+
+
         </div>
     </div>
+</div>
 
-    <script>
-        $(function(){
-            var socket = io.connect();
-            var $messageForm = $('#messageForm');
-            var $message = $('#message');
-            var $chat = $('#chat');
-            var $userForm = $('#userForm');
-            var $userFormArea = $('#userFormArea');
-            var $messageArea = $('#messageArea');
-            var $users = $('#users');
-            var $username = $('#username');
+<script>
+    $(function () {
+        var socket = io.connect();
+        var $messageForm = $('#messageForm');
+        var $message = $('#message');
+        var $chat = $('#chat');
+        var $userForm = $('#userForm');
+        var $userFormArea = $('#userFormArea');
+        var $messageArea = $('#messageArea');
+        var $users = $('#users');
+        var $username = $('#username');
 
-            $messageForm.submit(function(e){
-                e.preventDefault();
-                socket.emit('send message', $message.val());
-                $message.val('');
-            });
+        $messageForm.submit(function (e) {
+            e.preventDefault();
+            socket.emit('send message', $message.val());
+            $message.val('');
 
-            socket.on('new message', function(data){
-               $chat.append('<div class="well"><strong>'+data.user+': '+'</strong>'+data.msg+'</div>');
-            });
 
-            $userForm.submit(function(e){
-                e.preventDefault();
-                socket.emit('new user', $username.val(), function(data){
-                    if(data){
-                        $userFormArea.hide();
-                        $messageArea.show();
-                    }
-                });
-                $username.val('');
-            });
-
-            socket.on('get users', function(data){
-                var html = '';
-                for (i = 0; i < data.length; i++){
-                    html += '<li class"list-group-item">'+data[i]+'</li>';
-                }
-                $users.html(html);
-            })
         });
-    </script>
+
+        $('#supsonbutton').click(function () {
+            var supsonstring = ["¯&#92_(ツ)_/¯"];
+            socket.emit('send message', supsonstring);
+        });
+
+        $('#clearbutton').click(function () {
+            $('#chat').empty();
+        });
+
+
+        socket.on('new message', function (data) {
+            $chat.append('<div class="well"><strong>' + data.user + ': ' + '</strong>' + data.msg + '</div>');
+            var elem = document.getElementById('chatcontainer');
+            elem.scrollTop = elem.scrollHeight;
+        });
+
+        socket.on('new supson', function (data) {
+            $chat.append('<div class="well"><strong>' + data.user + ': ' + '</strong>' + data.msg + '</div>');
+        });
+
+        $userForm.submit(function (e) {
+            e.preventDefault();
+            socket.emit('new user', $username.val(), function (data) {
+                if (data) {
+                    $userFormArea.hide();
+                    $messageArea.show();
+
+                }
+            });
+            $username.val('');
+        });
+
+        socket.on('get users', function (data) {
+            var html = '';
+            for (i = 0; i < data.length; i++) {
+                html += '<li class"list-group-item">' + data[i] + '</li>';
+            }
+            $users.html(html);
+        });
+
+    });
+</script>
 </body>
 </html>
